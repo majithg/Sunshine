@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="me.kalehv.sunshine.MainActivity">
+    tools:context="me.kalehv.sunshine.DetailActivity">
 
     <include layout="@layout/app_bar" />
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_detail" />
 
 </android.support.design.widget.CoordinatorLayout>

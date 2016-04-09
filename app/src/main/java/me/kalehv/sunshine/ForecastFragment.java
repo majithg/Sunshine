@@ -1,8 +1,11 @@
 package me.kalehv.sunshine;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -43,6 +47,12 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -58,8 +68,7 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
-            FetchWeatherTask task = new FetchWeatherTask();
-            task.execute("66214");
+            updateWeather();
         }
 
         return super.onOptionsItemSelected(item);
@@ -77,13 +86,13 @@ public class ForecastFragment extends Fragment {
                 "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
                 "Sun 6/29 - Sunny - 20/7"
         };
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
+        List<String> weekForecast = new ArrayList<>(Arrays.asList(data));
 
         // Now that we have some dummy forecast data, create an ArrayAdapter.
         // The ArrayAdapter will take data from a source (like our dummy forecast) and
         // use it to populate the ListView it's attached to.
         mForecastAdapter =
-                new ArrayAdapter<String>(
+                new ArrayAdapter<>(
                         getActivity(), // The current context (this activity)
                         R.layout.list_item_forecast, // The name of the layout ID.
                         R.id.textview_list_item_forecast, // The ID of the textview to populate.
@@ -95,7 +104,26 @@ public class ForecastFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String forecast = mForecastAdapter.getItem(i);
+                Intent intent = new Intent(getContext(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(intent);
+            }
+        });
+
         return rootView;
+    }
+
+    private void updateWeather() {
+        FetchWeatherTask task = new FetchWeatherTask();
+        String location = PreferenceManager
+                .getDefaultSharedPreferences(getContext())
+                .getString(getString(R.string.pref_location_key),
+                        getString(R.string.pref_location_default_value));
+        task.execute(location);
     }
 
     class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
@@ -107,7 +135,20 @@ public class ForecastFragment extends Fragment {
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
-            // For presentation, assume the user doesn't care about tenths of a degree.
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPreferences.getString(
+                    getString(R.string.pref_units_key),
+                    getString(R.string.pref_units_metric)
+            );
+
+            if (unitType.equals(getString(R.string.pref_units_imperial))) {
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
+                Log.d(TAG, "Unit type not found : " + unitType);
+            }
+
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
