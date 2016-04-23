@@ -4,10 +4,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <permission android:name="me.kalehv.sunshine.ContentProviderPermission"
+        android:protectionLevel="dangerous"
+        android:label="Weather Data Provider"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".SunshineApplication"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
@@ -40,8 +45,11 @@
         </activity>
         
         <provider
+            android:enabled="true"
+            android:exported="true"
             android:authorities="me.kalehv.sunshine"
-            android:name=".data.WeatherProvider" />
+            android:name=".data.WeatherProvider"
+            android:permission="me.kalehv.sunshine.ContentProviderPermission"/>
     </application>
 
 </manifest>

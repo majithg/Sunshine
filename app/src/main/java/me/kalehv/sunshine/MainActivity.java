@@ -12,12 +12,34 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private String mLocation;
+    private static final String FORECASTFRAGMENT_TAG = "forecastfragment_tag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
+                    .commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String location = Utility.getPreferredLocation(this);
+        if (location != null && !location.equals(mLocation)) {
+            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+            if (forecastFragment != null) {
+                forecastFragment.onLocationChanged();
+            }
+            mLocation = location;
+        }
     }
 
     @Override
@@ -40,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.action_show_map) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            String location = sharedPreferences.getString(
+            mLocation = sharedPreferences.getString(
                     getString(R.string.pref_location_key),
                     getString(R.string.pref_location_default_value)
             );
 
             Uri geolocation = Uri.parse("geo:0,0").buildUpon()
-                    .appendQueryParameter("q", location)
+                    .appendQueryParameter("q", mLocation)
                     .build();
 
             showMap(geolocation);

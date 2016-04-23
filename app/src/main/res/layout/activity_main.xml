@@ -7,8 +7,18 @@
     android:fitsSystemWindows="true"
     tools:context="me.kalehv.sunshine.MainActivity">
 
-    <include layout="@layout/app_bar" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <include layout="@layout/content_main" />
+        <include layout="@layout/app_bar"/>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
