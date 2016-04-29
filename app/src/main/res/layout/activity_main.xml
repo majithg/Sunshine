@@ -14,10 +14,12 @@
 
         <include layout="@layout/app_bar"/>
 
-        <FrameLayout
-            android:id="@+id/container"
+        <fragment
+            android:id="@+id/fragment_forecast"
+            android:name="me.kalehv.sunshine.ForecastFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:context="me.kalehv.sunshine.ForecastFragment"/>
 
     </LinearLayout>
 
