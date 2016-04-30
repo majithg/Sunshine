@@ -50,6 +50,8 @@
             android:authorities="me.kalehv.sunshine"
             android:name=".data.WeatherProvider"
             android:permission="me.kalehv.sunshine.ContentProviderPermission"/>
+
+        <service android:name="service.SunshineService"/>
     </application>
 
 </manifest>

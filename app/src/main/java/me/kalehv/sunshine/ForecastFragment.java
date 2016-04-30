@@ -1,9 +1,9 @@
 package me.kalehv.sunshine;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import me.kalehv.sunshine.data.WeatherContract;
+import service.SunshineService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -129,12 +130,9 @@ public class ForecastFragment
     }
 
     private void updateWeather() {
-        FetchWeatherTask task = new FetchWeatherTask(getActivity());
-        String location = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getString(getString(R.string.pref_location_key),
-                        getString(R.string.pref_location_default_value));
-        task.execute(location);
+        Intent intent = new Intent(getActivity(), SunshineService.class);
+        intent.putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utility.getPreferredLocation(getActivity()));
+        getActivity().startService(intent);
     }
 
     public void onLocationChanged() {
